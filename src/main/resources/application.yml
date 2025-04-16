@@ -1,0 +1,13 @@
+spring:
+  application.name: ai-openai-tool-callback
+  ai:
+    openai:
+      api-key: ${OPENAI_APIKEY}
+      chat:
+        options:
+          model: gpt-4o
+
+app:
+  alphavantage:
+    api-key: ${ALPHAVANTAGE_APIKEY}
+    base-url: https://www.alphavantage.co

@@ -1,0 +1,68 @@
+body {
+    background-color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.exchange-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+.currency-form {
+    margin-bottom: 30px;
+}
+.icon-swap {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.icon-swap:hover {
+    transform: scale(1.2);
+}
+.result-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+.result-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+.rate-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #28a745;
+}
+.currency-select {
+    border-radius: 6px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+}
+.heading {
+    color: #343a40;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+.btn-exchange {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+.btn-exchange:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+.loading-spinner {
+    display: none;
+}
+.rate-info-row {
+    margin-bottom: 8px;
+}
+.rate-label {
+    font-weight: 600;
+    color: #6c757d;
+}

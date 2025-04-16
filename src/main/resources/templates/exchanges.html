@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Exchange Rates</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for some icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .exchange-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            background-color: white;
+        }
+        .currency-form {
+            margin-bottom: 30px;
+        }
+        .icon-swap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f4f8;
+            color: #0d6efd;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 auto;
+        }
+        .icon-swap:hover {
+            background-color: #e2e8f0;
+            transform: rotate(180deg);
+        }
+        .result-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            background-color: #f8fcff;
+            border: 1px solid #e1e9f2;
+        }
+        .result-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e9f2;
+        }
+        .rate-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+            margin: 15px 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .currency-select {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .currency-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .heading {
+            color: #0d6efd;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .btn-exchange {
+            background-color: #0d6efd;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-exchange:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35);
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .rate-info-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .rate-info-row:last-child {
+            border-bottom: none;
+        }
+        .rate-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .rate-value-field {
+            font-weight: 500;
+            color: #212529;
+        }
+        .currency-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .currency-box {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 48%;
+            text-align: center;
+        }
+        .currency-code {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .currency-name {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .exchange-arrow {
+            position: relative;
+            height: 2px;
+            background-color: #e9ecef;
+            margin: 25px 0;
+        }
+        .exchange-arrow:after {
+            content: '→';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8fcff;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            color: #0d6efd;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .data-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .data-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        .data-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="exchange-container">
+        <h1 class="heading">Currency Exchange Rates</h1>
+
+        <div class="currency-form">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <label for="fromCurrency" class="form-label">From Currency</label>
+                    <select id="fromCurrency" class="form-select currency-select">
+                        <option value="">Select Currency</option>
+                        <optgroup label="Digital Currencies">
+                            <option th:each="currency : ${currencies.digital}"
+                                    th:value="${currency.code}"
+                                    th:text="${currency.code + ' - ' + currency.name}"></option>
+                        </optgroup>
+                        <optgroup label="Physical Currencies">
+                            <option th:each="currency : ${currencies.physical}"
+                                    th:value="${currency.code}"
+                                    th:text="${currency.code + ' - ' + currency.name}"></option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="col-md-2 text-center">
+                    <div class="mt-4">
+                        <div class="icon-swap" id="swapButton">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <label for="toCurrency" class="form-label">To Currency</label>
+                    <select id="toCurrency" class="form-select currency-select">
+                        <option value="">Select Currency</option>
+                        <optgroup label="Digital Currencies">
+                            <option th:each="currency : ${currencies.digital}"
+                                    th:value="${currency.code}"
+                                    th:text="${currency.code + ' - ' + currency.name}"></option>
+                        </optgroup>
+                        <optgroup label="Physical Currencies">
+                            <option th:each="currency : ${currencies.physical}"
+                                    th:value="${currency.code}"
+                                    th:text="${currency.code + ' - ' + currency.name}"></option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <button id="getExchangeRate" class="btn btn-exchange btn-primary">
+                        <span class="btn-text">Get Exchange Rate</span>
+                        <span class="loading-spinner spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="result-card mt-4" style="display: none;">
+            <div class="result-header">
+                <h3 class="text-center">Exchange Rate</h3>
+
+                <div class="currency-info">
+                    <div class="currency-box" id="fromCurrencyBox">
+                        <div class="currency-code" id="fromCurrencyCode"></div>
+                        <div class="currency-name" id="fromCurrencyName"></div>
+                    </div>
+
+                    <div class="currency-box" id="toCurrencyBox">
+                        <div class="currency-code" id="toCurrencyCode"></div>
+                        <div class="currency-name" id="toCurrencyName"></div>
+                    </div>
+                </div>
+
+                <div class="exchange-arrow"></div>
+
+                <div class="text-center">
+                    <div class="rate-value" id="rateValue"></div>
+                    <div id="rateDescription" class="text-muted"></div>
+                </div>
+            </div>
+
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-label">Bid Price</div>
+                    <div class="data-value" id="bidPrice"></div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-label">Ask Price</div>
+                    <div class="data-value" id="askPrice"></div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-label">Last Refreshed</div>
+                    <div class="data-value" id="lastRefreshed"></div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-label">Time Zone</div>
+                    <div class="data-value" id="timeZone"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorContainer" class="alert alert-danger mt-4" style="display: none;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="errorMessage"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap & jQuery JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Swap currencies button
+        $("#swapButton").click(function() {
+            const fromValue = $("#fromCurrency").val();
+            const toValue = $("#toCurrency").val();
+
+            $("#fromCurrency").val(toValue);
+            $("#toCurrency").val(fromValue);
+        });
+
+        // Get exchange rate button
+        $("#getExchangeRate").click(function() {
+            const fromCurrency = $("#fromCurrency").val();
+            const toCurrency = $("#toCurrency").val();
+
+            // Validation
+            if (!fromCurrency || !toCurrency) {
+                showError("Please select both currencies");
+                return;
+            }
+
+            if (fromCurrency === toCurrency) {
+                showError("Please select different currencies");
+                return;
+            }
+
+            // Hide previous results and errors
+            $("#resultContainer").hide();
+            $("#errorContainer").hide();
+
+            // Show loading spinner
+            toggleLoading(true);
+
+            // Make AJAX call to get exchange rate
+            $.ajax({
+                url: `/exchange-rate/${fromCurrency}/${toCurrency}`,
+                method: "GET",
+                success: function(response) {
+                    toggleLoading(false);
+                    displayExchangeRate(response);
+                },
+                error: function(xhr) {
+                    toggleLoading(false);
+                    let errorMsg = "Failed to get exchange rate";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    showError(errorMsg);
+                }
+            });
+        });
+
+        function displayExchangeRate(data) {
+            if (data && data["Realtime Currency Exchange Rate"]) {
+                const rateData = data["Realtime Currency Exchange Rate"];
+
+                // Check if rateData is null
+                if (rateData === null) {
+                    showError("Exchange rate calculation is not available for this currency pair. Please try another combination.");
+                    return;
+                }
+
+                // Format the exchange rate for display
+                const rateValue = parseFloat(rateData["5. Exchange Rate"]).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 8
+                });
+
+                // Update the UI with the exchange rate details
+                $("#fromCurrencyCode").text(rateData["1. From_Currency Code"]);
+                $("#fromCurrencyName").text(rateData["2. From_Currency Name"]);
+                $("#toCurrencyCode").text(rateData["3. To_Currency Code"]);
+                $("#toCurrencyName").text(rateData["4. To_Currency Name"]);
+
+                $("#rateValue").text(rateValue);
+                $("#rateDescription").text(`1 ${rateData["1. From_Currency Code"]} = ${rateValue} ${rateData["3. To_Currency Code"]}`);
+
+                $("#bidPrice").text(parseFloat(rateData["8. Bid Price"]).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 8
+                }));
+                $("#askPrice").text(parseFloat(rateData["9. Ask Price"]).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 8
+                }));
+                $("#lastRefreshed").text(rateData["6. Last Refreshed"]);
+                $("#timeZone").text(rateData["7. Time Zone"]);
+
+                // Show the result container
+                $("#resultContainer").fadeIn();
+            } else {
+                showError("Exchange rate calculation is not available for this currency pair. Please try another combination.");
+            }
+        }
+
+        function showError(message) {
+            $("#errorMessage").text(message);
+            $("#errorContainer").fadeIn();
+        }
+
+        function toggleLoading(isLoading) {
+            if (isLoading) {
+                $("#getExchangeRate .btn-text").hide();
+                $("#getExchangeRate .loading-spinner").show();
+                $("#getExchangeRate").prop("disabled", true);
+            } else {
+                $("#getExchangeRate .btn-text").show();
+                $("#getExchangeRate .loading-spinner").hide();
+                $("#getExchangeRate").prop("disabled", false);
+            }
+        }
+    });
+</script>
+</body>
+</html>
